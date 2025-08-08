@@ -1,0 +1,667 @@
+{% extends "base.html" %}
+
+{% block title %}Study Planner - DiskTools{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-6 py-12">
+    <!-- Header -->
+    <div class="text-center mb-12">
+        <div class="inline-block p-4 bg-gradient-to-r from-primary to-secondary rounded-full mb-6">
+            <i class="fas fa-calendar-alt text-4xl text-white"></i>
+        </div>
+        <h1 class="text-4xl font-bold mb-4 text-gradient">Study Planner</h1>
+        <p class="text-xl text-gray-300">AI-powered study schedules with spaced repetition</p>
+    </div>
+
+    <!-- Planning Interface -->
+    <div class="max-w-6xl mx-auto">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Subject Management -->
+            <div class="lg:col-span-2">
+                <div class="glass rounded-2xl p-6 mb-6">
+                    <h2 class="text-2xl font-bold mb-6 flex items-center">
+                        <i class="fas fa-book text-primary mr-3"></i>
+                        Subjects & Topics
+                    </h2>
+                    
+                    <!-- Add Subject Form -->
+                    <div class="bg-dark/50 rounded-xl p-4 mb-6">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <input type="text" id="subjectName" placeholder="Subject Name" class="input-field">
+                            <input type="date" id="examDate" class="input-field">
+                            <select id="difficulty" class="input-field">
+                                <option value="easy">Easy</option>
+                                <option value="medium" selected>Medium</option>
+                                <option value="hard">Hard</option>
+                            </select>
+                        </div>
+                        <div class="mt-4">
+                            <textarea id="topics" placeholder="Enter topics (one per line)" class="input-field w-full h-24 resize-none"></textarea>
+                        </div>
+                        <button id="addSubject" class="btn-primary mt-4">
+                            <i class="fas fa-plus mr-2"></i>
+                            Add Subject
+                        </button>
+                    </div>
+                    
+                    <!-- Subjects List -->
+                    <div id="subjectsList" class="space-y-4">
+                        <!-- Subjects will be populated here -->
+                    </div>
+                </div>
+                
+                <!-- Study Schedule -->
+                <div class="glass rounded-2xl p-6">
+                    <h2 class="text-2xl font-bold mb-6 flex items-center">
+                        <i class="fas fa-clock text-primary mr-3"></i>
+                        Generated Study Schedule
+                    </h2>
+                    
+                    <div class="mb-4 flex flex-wrap gap-4">
+                        <button id="generateSchedule" class="btn-primary">
+                            <i class="fas fa-magic mr-2"></i>
+                            Generate AI Schedule
+                        </button>
+                        <button id="exportSchedule" class="btn-secondary">
+                            <i class="fas fa-download mr-2"></i>
+                            Export Schedule
+                        </button>
+                    </div>
+                    
+                    <div id="scheduleContainer" class="space-y-4">
+                        <p class="text-gray-400 text-center py-8">Add subjects to generate your personalized study schedule</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Settings & Progress -->
+            <div class="space-y-6">
+                <!-- Study Preferences -->
+                <div class="glass rounded-2xl p-6">
+                    <h3 class="text-xl font-bold mb-4 flex items-center">
+                        <i class="fas fa-cog text-primary mr-3"></i>
+                        Study Preferences
+                    </h3>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm text-gray-300 mb-2">Daily Study Hours</label>
+                            <input id="dailyHours" type="range" min="1" max="12" value="4" class="w-full">
+                            <div class="text-center text-sm text-gray-400 mt-1">
+                                <span id="hoursValue">4</span> hours/day
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm text-gray-300 mb-2">Session Length</label>
+                            <select id="sessionLength" class="input-field w-full">
+                                <option value="25">25 minutes</option>
+                                <option value="45" selected>45 minutes</option>
+                                <option value="60">60 minutes</option>
+                                <option value="90">90 minutes</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm text-gray-300 mb-2">Break Length</label>
+                            <select id="breakLength" class="input-field w-full">
+                                <option value="5">5 minutes</option>
+                                <option value="10" selected>10 minutes</option>
+                                <option value="15">15 minutes</option>
+                                <option value="30">30 minutes</option>
+                            </select>
+                        </div>
+                        
+                        <div class="flex items-center justify-between">
+                            <label class="text-sm text-gray-300">Weekend Study</label>
+                            <input id="weekendStudy" type="checkbox" checked class="toggle-switch">
+                        </div>
+                        
+                        <div class="flex items-center justify-between">
+                            <label class="text-sm text-gray-300">Spaced Repetition</label>
+                            <input id="spacedRepetition" type="checkbox" checked class="toggle-switch">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Progress Tracking -->
+                <div class="glass rounded-2xl p-6">
+                    <h3 class="text-xl font-bold mb-4 flex items-center">
+                        <i class="fas fa-chart-line text-primary mr-3"></i>
+                        Progress Overview
+                    </h3>
+                    
+                    <div class="space-y-4">
+                        <div class="text-center">
+                            <div class="text-3xl font-bold text-gradient mb-2" id="completionRate">0%</div>
+                            <p class="text-gray-400">Overall Completion</p>
+                        </div>
+                        
+                        <div class="w-full bg-dark/50 rounded-full h-3">
+                            <div id="progressBar" class="bg-gradient-to-r from-primary to-secondary h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4 text-center">
+                            <div class="bg-dark/30 rounded-lg p-3">
+                                <div class="text-lg font-bold text-green-400" id="completedSessions">0</div>
+                                <div class="text-xs text-gray-400">Completed</div>
+                            </div>
+                            <div class="bg-dark/30 rounded-lg p-3">
+                                <div class="text-lg font-bold text-blue-400" id="totalSessions">0</div>
+                                <div class="text-xs text-gray-400">Total Sessions</div>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-2">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-300">Study Streak:</span>
+                                <span class="font-bold text-yellow-400" id="studyStreak">0 days</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-300">Next Session:</span>
+                                <span class="font-bold text-primary" id="nextSession">Not scheduled</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Quick Actions -->
+                <div class="glass rounded-2xl p-6">
+                    <h3 class="text-xl font-bold mb-4 flex items-center">
+                        <i class="fas fa-bolt text-primary mr-3"></i>
+                        Quick Actions
+                    </h3>
+                    
+                    <div class="space-y-3">
+                        <button id="startStudySession" class="w-full btn-primary">
+                            <i class="fas fa-play mr-2"></i>
+                            Start Study Session
+                        </button>
+                        <button id="reviewNotes" class="w-full btn-secondary">
+                            <i class="fas fa-eye mr-2"></i>
+                            Review Notes
+                        </button>
+                        <button id="takeBreak" class="w-full btn-secondary">
+                            <i class="fas fa-coffee mr-2"></i>
+                            Take Break
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Study Session Modal -->
+<div id="studyModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden items-center justify-center">
+    <div class="glass rounded-2xl p-8 max-w-md mx-4 text-center">
+        <div class="text-6xl mb-4">📚</div>
+        <h3 class="text-2xl font-bold mb-4">Study Session</h3>
+        <div id="currentSubject" class="text-lg text-primary mb-2">Mathematics</div>
+        <div id="currentTopic" class="text-gray-300 mb-6">Calculus - Derivatives</div>
+        <div id="sessionTimer" class="text-4xl font-bold mb-6">45:00</div>
+        <div class="flex space-x-4">
+            <button id="pauseSession" class="btn-secondary flex-1">Pause</button>
+            <button id="completeSession" class="btn-primary flex-1">Complete</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+class StudyPlanner {
+    constructor() {
+        this.subjects = JSON.parse(localStorage.getItem('disktools-study-subjects') || '[]');
+        this.schedule = JSON.parse(localStorage.getItem('disktools-study-schedule') || '[]');
+        this.progress = JSON.parse(localStorage.getItem('disktools-study-progress') || '{}');
+        this.currentSession = null;
+        this.sessionTimer = null;
+        
+        this.init();
+    }
+
+    init() {
+        this.setupEventListeners();
+        this.loadSubjects();
+        this.updateProgress();
+        this.loadSchedule();
+    }
+
+    setupEventListeners() {
+        // Subject management
+        document.getElementById('addSubject').addEventListener('click', () => this.addSubject());
+        document.getElementById('generateSchedule').addEventListener('click', () => this.generateSchedule());
+        document.getElementById('exportSchedule').addEventListener('click', () => this.exportSchedule());
+        
+        // Study session
+        document.getElementById('startStudySession').addEventListener('click', () => this.startStudySession());
+        document.getElementById('pauseSession').addEventListener('click', () => this.pauseSession());
+        document.getElementById('completeSession').addEventListener('click', () => this.completeSession());
+        
+        // Settings
+        document.getElementById('dailyHours').addEventListener('input', (e) => {
+            document.getElementById('hoursValue').textContent = e.target.value;
+        });
+        
+        // Enter key for adding subjects
+        document.getElementById('subjectName').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') this.addSubject();
+        });
+    }
+
+    addSubject() {
+        const name = document.getElementById('subjectName').value.trim();
+        const examDate = document.getElementById('examDate').value;
+        const difficulty = document.getElementById('difficulty').value;
+        const topicsText = document.getElementById('topics').value.trim();
+        
+        if (!name) {
+            ToolAPI.showError('Please enter a subject name');
+            return;
+        }
+        
+        const topics = topicsText.split('\n').filter(topic => topic.trim()).map(topic => ({
+            name: topic.trim(),
+            completed: false,
+            lastStudied: null,
+            difficulty: difficulty
+        }));
+        
+        const subject = {
+            id: Date.now(),
+            name,
+            examDate,
+            difficulty,
+            topics,
+            totalSessions: 0,
+            completedSessions: 0,
+            created: new Date().toISOString()
+        };
+        
+        this.subjects.push(subject);
+        this.saveSubjects();
+        this.loadSubjects();
+        
+        // Clear form
+        document.getElementById('subjectName').value = '';
+        document.getElementById('examDate').value = '';
+        document.getElementById('topics').value = '';
+        
+        ToolAPI.showSuccess('Subject added successfully!');
+    }
+
+    loadSubjects() {
+        const container = document.getElementById('subjectsList');
+        
+        if (this.subjects.length === 0) {
+            container.innerHTML = '<p class="text-gray-400 text-center py-8">No subjects added yet</p>';
+            return;
+        }
+        
+        container.innerHTML = this.subjects.map(subject => {
+            const completionRate = subject.topics.length > 0 ? 
+                Math.round((subject.topics.filter(t => t.completed).length / subject.topics.length) * 100) : 0;
+            
+            const daysUntilExam = subject.examDate ? 
+                Math.ceil((new Date(subject.examDate) - new Date()) / (1000 * 60 * 60 * 24)) : null;
+            
+            return `
+                <div class="subject-card bg-dark/30 rounded-xl p-4 border border-white/10">
+                    <div class="flex justify-between items-start mb-3">
+                        <div>
+                            <h3 class="text-lg font-bold text-white">${subject.name}</h3>
+                            <div class="flex items-center space-x-4 text-sm text-gray-400 mt-1">
+                                <span><i class="fas fa-book mr-1"></i>${subject.topics.length} topics</span>
+                                ${subject.examDate ? `<span><i class="fas fa-calendar mr-1"></i>${daysUntilExam} days</span>` : ''}
+                                <span class="difficulty-${subject.difficulty}">${subject.difficulty}</span>
+                            </div>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button onclick="editSubject(${subject.id})" class="text-blue-400 hover:text-blue-300">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="deleteSubject(${subject.id})" class="text-red-400 hover:text-red-300">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="flex justify-between text-sm mb-1">
+                            <span class="text-gray-300">Progress</span>
+                            <span class="text-primary">${completionRate}%</span>
+                        </div>
+                        <div class="w-full bg-dark/50 rounded-full h-2">
+                            <div class="bg-gradient-to-r from-primary to-secondary h-2 rounded-full transition-all duration-300" 
+                                 style="width: ${completionRate}%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="topics-list max-h-32 overflow-y-auto">
+                        ${subject.topics.map(topic => `
+                            <div class="flex items-center justify-between py-1 text-sm">
+                                <span class="${topic.completed ? 'text-green-400 line-through' : 'text-gray-300'}">${topic.name}</span>
+                                <button onclick="toggleTopic(${subject.id}, '${topic.name}')" 
+                                        class="${topic.completed ? 'text-green-400' : 'text-gray-500'} hover:text-green-300">
+                                    <i class="fas fa-check-circle"></i>
+                                </button>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    generateSchedule() {
+        if (this.subjects.length === 0) {
+            ToolAPI.showError('Please add subjects first');
+            return;
+        }
+        
+        const dailyHours = parseInt(document.getElementById('dailyHours').value);
+        const sessionLength = parseInt(document.getElementById('sessionLength').value);
+        const breakLength = parseInt(document.getElementById('breakLength').value);
+        const weekendStudy = document.getElementById('weekendStudy').checked;
+        const spacedRepetition = document.getElementById('spacedRepetition').checked;
+        
+        // Calculate sessions per day
+        const sessionsPerDay = Math.floor((dailyHours * 60) / (sessionLength + breakLength));
+        
+        // Generate 7-day schedule
+        const schedule = [];
+        const today = new Date();
+        
+        for (let day = 0; day < 7; day++) {
+            const currentDate = new Date(today);
+            currentDate.setDate(today.getDate() + day);
+            
+            // Skip weekends if not enabled
+            if (!weekendStudy && (currentDate.getDay() === 0 || currentDate.getDay() === 6)) {
+                continue;
+            }
+            
+            const daySchedule = {
+                date: currentDate.toISOString().split('T')[0],
+                dayName: currentDate.toLocaleDateString('en', { weekday: 'long' }),
+                sessions: []
+            };
+            
+            // Distribute subjects across sessions
+            const availableSubjects = [...this.subjects];
+            
+            for (let session = 0; session < sessionsPerDay; session++) {
+                if (availableSubjects.length === 0) break;
+                
+                // Priority: subjects with exams soon, then by difficulty
+                availableSubjects.sort((a, b) => {
+                    if (a.examDate && b.examDate) {
+                        return new Date(a.examDate) - new Date(b.examDate);
+                    }
+                    if (a.examDate) return -1;
+                    if (b.examDate) return 1;
+                    
+                    const difficultyOrder = { hard: 3, medium: 2, easy: 1 };
+                    return difficultyOrder[b.difficulty] - difficultyOrder[a.difficulty];
+                });
+                
+                const subject = availableSubjects[session % availableSubjects.length];
+                const incompleteTopic = subject.topics.find(t => !t.completed);
+                
+                if (incompleteTopic) {
+                    const startTime = 9 + Math.floor(session * (sessionLength + breakLength) / 60);
+                    const startMinutes = (session * (sessionLength + breakLength)) % 60;
+                    
+                    daySchedule.sessions.push({
+                        subject: subject.name,
+                        topic: incompleteTopic.name,
+                        startTime: `${startTime.toString().padStart(2, '0')}:${startMinutes.toString().padStart(2, '0')}`,
+                        duration: sessionLength,
+                        type: spacedRepetition && Math.random() > 0.7 ? 'review' : 'new',
+                        completed: false
+                    });
+                }
+            }
+            
+            schedule.push(daySchedule);
+        }
+        
+        this.schedule = schedule;
+        this.saveSchedule();
+        this.loadSchedule();
+        
+        ToolAPI.showSuccess('Study schedule generated!');
+    }
+
+    loadSchedule() {
+        const container = document.getElementById('scheduleContainer');
+        
+        if (this.schedule.length === 0) {
+            container.innerHTML = '<p class="text-gray-400 text-center py-8">Generate a schedule to see your study plan</p>';
+            return;
+        }
+        
+        container.innerHTML = this.schedule.map(day => `
+            <div class="schedule-day bg-dark/30 rounded-xl p-4 border border-white/10">
+                <h3 class="text-lg font-bold text-white mb-3">${day.dayName} - ${new Date(day.date).toLocaleDateString()}</h3>
+                <div class="space-y-2">
+                    ${day.sessions.map(session => `
+                        <div class="flex items-center justify-between p-3 bg-dark/50 rounded-lg ${session.completed ? 'opacity-50' : ''}">
+                            <div class="flex items-center space-x-3">
+                                <div class="text-primary font-mono text-sm">${session.startTime}</div>
+                                <div>
+                                    <div class="font-semibold text-white">${session.subject}</div>
+                                    <div class="text-sm text-gray-400">${session.topic} (${session.duration}min)</div>
+                                </div>
+                                ${session.type === 'review' ? '<span class="text-yellow-400 text-xs">REVIEW</span>' : ''}
+                            </div>
+                            <button onclick="toggleSessionComplete('${day.date}', ${day.sessions.indexOf(session)})" 
+                                    class="${session.completed ? 'text-green-400' : 'text-gray-500'} hover:text-green-300">
+                                <i class="fas fa-check-circle"></i>
+                            </button>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `).join('');
+    }
+
+    startStudySession() {
+        // Find next incomplete session
+        const today = new Date().toISOString().split('T')[0];
+        const todaySchedule = this.schedule.find(day => day.date === today);
+        
+        if (!todaySchedule) {
+            ToolAPI.showError('No sessions scheduled for today');
+            return;
+        }
+        
+        const nextSession = todaySchedule.sessions.find(s => !s.completed);
+        if (!nextSession) {
+            ToolAPI.showSuccess('All sessions completed for today!');
+            return;
+        }
+        
+        this.currentSession = {
+            ...nextSession,
+            timeLeft: nextSession.duration * 60,
+            totalTime: nextSession.duration * 60
+        };
+        
+        document.getElementById('currentSubject').textContent = nextSession.subject;
+        document.getElementById('currentTopic').textContent = nextSession.topic;
+        document.getElementById('studyModal').classList.remove('hidden');
+        document.getElementById('studyModal').classList.add('flex');
+        
+        this.startSessionTimer();
+    }
+
+    startSessionTimer() {
+        this.sessionTimer = setInterval(() => {
+            this.currentSession.timeLeft--;
+            
+            const minutes = Math.floor(this.currentSession.timeLeft / 60);
+            const seconds = this.currentSession.timeLeft % 60;
+            
+            document.getElementById('sessionTimer').textContent = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            if (this.currentSession.timeLeft <= 0) {
+                this.completeSession();
+            }
+        }, 1000);
+    }
+
+    pauseSession() {
+        if (this.sessionTimer) {
+            clearInterval(this.sessionTimer);
+            this.sessionTimer = null;
+            document.getElementById('pauseSession').innerHTML = '<i class="fas fa-play mr-2"></i>Resume';
+        } else {
+            this.startSessionTimer();
+            document.getElementById('pauseSession').innerHTML = '<i class="fas fa-pause mr-2"></i>Pause';
+        }
+    }
+
+    completeSession() {
+        if (this.sessionTimer) {
+            clearInterval(this.sessionTimer);
+        }
+        
+        // Mark session as completed
+        const today = new Date().toISOString().split('T')[0];
+        const todaySchedule = this.schedule.find(day => day.date === today);
+        if (todaySchedule) {
+            const session = todaySchedule.sessions.find(s => 
+                s.subject === this.currentSession.subject && s.topic === this.currentSession.topic);
+            if (session) {
+                session.completed = true;
+            }
+        }
+        
+        this.saveSchedule();
+        this.loadSchedule();
+        this.updateProgress();
+        
+        document.getElementById('studyModal').classList.add('hidden');
+        ToolAPI.showSuccess('Session completed! Great job! 🎉');
+    }
+
+    updateProgress() {
+        const totalSessions = this.schedule.reduce((total, day) => total + day.sessions.length, 0);
+        const completedSessions = this.schedule.reduce((total, day) => 
+            total + day.sessions.filter(s => s.completed).length, 0);
+        
+        const completionRate = totalSessions > 0 ? Math.round((completedSessions / totalSessions) * 100) : 0;
+        
+        document.getElementById('completionRate').textContent = `${completionRate}%`;
+        document.getElementById('progressBar').style.width = `${completionRate}%`;
+        document.getElementById('completedSessions').textContent = completedSessions;
+        document.getElementById('totalSessions').textContent = totalSessions;
+        
+        // Update next session
+        const today = new Date().toISOString().split('T')[0];
+        const todaySchedule = this.schedule.find(day => day.date === today);
+        const nextSession = todaySchedule?.sessions.find(s => !s.completed);
+        
+        document.getElementById('nextSession').textContent = nextSession ? 
+            `${nextSession.subject} at ${nextSession.startTime}` : 'All done for today!';
+    }
+
+    exportSchedule() {
+        const scheduleText = this.schedule.map(day => {
+            const sessions = day.sessions.map(s => 
+                `${s.startTime} - ${s.subject}: ${s.topic} (${s.duration}min)`).join('\n  ');
+            return `${day.dayName} - ${new Date(day.date).toLocaleDateString()}\n  ${sessions}`;
+        }).join('\n\n');
+        
+        const blob = new Blob([scheduleText], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'study-schedule.txt';
+        a.click();
+        URL.revokeObjectURL(url);
+        
+        ToolAPI.showSuccess('Schedule exported successfully!');
+    }
+
+    saveSubjects() {
+        localStorage.setItem('disktools-study-subjects', JSON.stringify(this.subjects));
+    }
+
+    saveSchedule() {
+        localStorage.setItem('disktools-study-schedule', JSON.stringify(this.schedule));
+    }
+}
+
+// Global functions for inline event handlers
+function deleteSubject(id) {
+    if (window.studyPlanner) {
+        window.studyPlanner.subjects = window.studyPlanner.subjects.filter(s => s.id !== id);
+        window.studyPlanner.saveSubjects();
+        window.studyPlanner.loadSubjects();
+        ToolAPI.showSuccess('Subject deleted');
+    }
+}
+
+function toggleTopic(subjectId, topicName) {
+    if (window.studyPlanner) {
+        const subject = window.studyPlanner.subjects.find(s => s.id === subjectId);
+        if (subject) {
+            const topic = subject.topics.find(t => t.name === topicName);
+            if (topic) {
+                topic.completed = !topic.completed;
+                topic.lastStudied = new Date().toISOString();
+                window.studyPlanner.saveSubjects();
+                window.studyPlanner.loadSubjects();
+                window.studyPlanner.updateProgress();
+            }
+        }
+    }
+}
+
+function toggleSessionComplete(date, sessionIndex) {
+    if (window.studyPlanner) {
+        const daySchedule = window.studyPlanner.schedule.find(day => day.date === date);
+        if (daySchedule && daySchedule.sessions[sessionIndex]) {
+            daySchedule.sessions[sessionIndex].completed = !daySchedule.sessions[sessionIndex].completed;
+            window.studyPlanner.saveSchedule();
+            window.studyPlanner.loadSchedule();
+            window.studyPlanner.updateProgress();
+        }
+    }
+}
+
+// Custom styles
+const plannerStyles = `
+    .difficulty-easy { color: #4ade80; }
+    .difficulty-medium { color: #fbbf24; }
+    .difficulty-hard { color: #ef4444; }
+    
+    .topics-list::-webkit-scrollbar {
+        width: 4px;
+    }
+    
+    .topics-list::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 2px;
+    }
+    
+    .topics-list::-webkit-scrollbar-thumb {
+        background: rgba(102, 126, 234, 0.5);
+        border-radius: 2px;
+    }
+`;
+
+const styleSheet = document.createElement('style');
+styleSheet.textContent = plannerStyles;
+document.head.appendChild(styleSheet);
+
+// Initialize study planner
+document.addEventListener('DOMContentLoaded', () => {
+    window.studyPlanner = new StudyPlanner();
+});
+</script>
+{% endblock %}

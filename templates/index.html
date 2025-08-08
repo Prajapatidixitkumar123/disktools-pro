@@ -1,0 +1,617 @@
+{% extends "base.html" %}
+
+{% block title %}DiskTools - Premium Student Toolkit{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section relative min-h-screen flex items-center justify-center overflow-hidden">
+    <div class="container mx-auto px-6 text-center relative z-10">
+        <div class="mb-6">
+            <div class="disk-logo mx-auto mb-4 animate-spin-slow">
+                <i class="fas fa-compact-disc text-6xl md:text-8xl text-primary glow-effect"></i>
+            </div>
+            <h1 class="hero-title text-4xl md:text-6xl font-bold mb-6 typewriter">
+                <span class="text-gradient">Disk</span><span class="text-white">Tools</span>
+                <span class="text-gradient"> Pro</span>
+            </h1>
+            <p class="hero-subtitle text-lg md:text-xl text-gray-300 mb-8 max-w-3xl mx-auto fade-in-up">
+                The ultimate premium student toolkit with 10+ powerful tools designed to boost your academic productivity, security, and success. Trusted by thousands of students worldwide.
+            </p>
+        </div>
+        
+        <div class="flex flex-col sm:flex-row gap-3 justify-center mb-8 fade-in-up px-4">
+            <a href="#tools" class="btn-primary text-base sm:text-lg px-6 sm:px-8 py-3 sm:py-4 hover-lift w-full sm:w-auto">
+                <i class="fas fa-rocket mr-2"></i>
+                Explore Tools
+            </a>
+            <a href="#features" class="btn-secondary text-base sm:text-lg px-6 sm:px-8 py-3 sm:py-4 hover-lift w-full sm:w-auto">
+                <i class="fas fa-star mr-2"></i>
+                Learn More
+            </a>
+            <button id="demoBtn" class="btn-outline text-base sm:text-lg px-6 sm:px-8 py-3 sm:py-4 hover-lift w-full sm:w-auto">
+                <i class="fas fa-play mr-2"></i>
+                Watch Demo
+            </button>
+        </div>
+        
+        <!-- Enhanced Quick Stats -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto stagger-animation">
+            <div class="stat-card glass hover-lift">
+                <div class="stat-icon mb-2">
+                    <i class="fas fa-tools text-2xl text-primary"></i>
+                </div>
+                <div class="stat-number text-gradient">10+</div>
+                <div class="stat-label">Professional Tools</div>
+            </div>
+            <div class="stat-card glass hover-lift">
+                <div class="stat-icon mb-2">
+                    <i class="fas fa-users text-2xl text-secondary"></i>
+                </div>
+                <div class="stat-number text-gradient">1K+</div>
+                <div class="stat-label">Happy Students</div>
+            </div>
+            <div class="stat-card glass hover-lift">
+                <div class="stat-icon mb-2">
+                    <i class="fas fa-shield-check text-2xl text-green-400"></i>
+                </div>
+                <div class="stat-number text-gradient">99.9%</div>
+                <div class="stat-label">Uptime</div>
+            </div>
+            <div class="stat-card glass hover-lift">
+                <div class="stat-icon mb-2">
+                    <i class="fas fa-clock text-2xl text-yellow-400"></i>
+                </div>
+                <div class="stat-number text-gradient">24/7</div>
+                <div class="stat-label">Available</div>
+            </div>
+        </div>
+        
+        <!-- Trust Indicators -->
+        <div class="trust-indicators mt-6 flex flex-wrap justify-center items-center gap-6 opacity-60">
+            <div class="flex items-center space-x-2">
+                <i class="fas fa-lock text-green-400"></i>
+                <span class="text-sm">Secure & Private</span>
+            </div>
+            <div class="flex items-center space-x-2">
+                <i class="fas fa-mobile-alt text-blue-400"></i>
+                <span class="text-sm">Mobile Friendly</span>
+            </div>
+            <div class="flex items-center space-x-2">
+                <i class="fas fa-wifi text-purple-400"></i>
+                <span class="text-sm">Works Offline</span>
+            </div>
+            <div class="flex items-center space-x-2">
+                <i class="fas fa-heart text-red-400"></i>
+                <span class="text-sm">Made with Love</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Enhanced Animated Background -->
+    <div class="particles-container"></div>
+    
+    <!-- Scroll Indicator -->
+    <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+        <div class="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center">
+            <div class="w-1 h-3 bg-white/50 rounded-full mt-2 animate-pulse"></div>
+        </div>
+        <p class="text-xs text-white/50 mt-2">Scroll to explore</p>
+    </div>
+</section>
+
+<!-- Tools Search Section -->
+<section id="tools" class="py-20">
+    <div class="container mx-auto px-6">
+        <div class="text-center mb-12">
+            <h2 class="text-4xl font-bold mb-4 text-gradient">Discover Your Perfect Tool</h2>
+            <p class="text-xl text-gray-300 mb-8">Search through our comprehensive collection of student productivity tools</p>
+            
+            <!-- Search Bar -->
+            <div class="max-w-2xl mx-auto relative">
+                <div class="relative">
+                    <input 
+                        type="text" 
+                        id="toolSearch" 
+                        placeholder="Search tools... (Ctrl+K)"
+                        class="w-full px-6 py-4 pl-14 bg-glass backdrop-blur-lg border border-white/20 rounded-full text-white placeholder-gray-400 focus:outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all"
+                    >
+                    <i class="fas fa-search absolute left-5 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                </div>
+                <div id="searchResults" class="text-sm text-gray-400 mt-2"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Academic Excellence Tools -->
+<section class="category-section py-16">
+    <div class="container mx-auto px-6">
+        <div class="text-center mb-12">
+            <h2 class="category-title">📚 Academic Excellence</h2>
+            <p class="category-subtitle">Master your grades and academic performance</p>
+        </div>
+        
+        <div class="tools-grid stagger-animation">
+            <!-- GPA Calculator -->
+            <div class="tool-card scroll-reveal hover-lift" data-tool="gpa-calculator">
+                <div class="tool-icon">
+                    <i class="fas fa-calculator"></i>
+                </div>
+                <h3 class="tool-title">GPA Calculator</h3>
+                <p class="tool-description">
+                    Calculate your semester and cumulative GPA with grade predictions and academic planning features.
+                </p>
+                <div class="tool-tags">
+                    <span class="tool-tag">GPA</span>
+                    <span class="tool-tag">Grades</span>
+                    <span class="tool-tag">Academic</span>
+                </div>
+            </div>
+            
+            <!-- Study Planner -->
+            <div class="tool-card scroll-reveal hover-lift" data-tool="study-planner">
+                <div class="tool-icon">
+                    <i class="fas fa-calendar-alt"></i>
+                </div>
+                <h3 class="tool-title">Study Planner</h3>
+                <p class="tool-description">
+                    AI-powered study schedules with spaced repetition algorithms for optimal learning retention.
+                </p>
+                <div class="tool-tags">
+                    <span class="tool-tag">Planning</span>
+                    <span class="tool-tag">AI</span>
+                    <span class="tool-tag">Study</span>
+                </div>
+            </div>
+            
+            <!-- Assignment Tracker -->
+            <div class="tool-card scroll-reveal hover-lift" data-tool="assignment-tracker">
+                <div class="tool-icon">
+                    <i class="fas fa-tasks"></i>
+                </div>
+                <h3 class="tool-title">Assignment Tracker</h3>
+                <p class="tool-description">
+                    Track assignments with progress visualization, deadline alerts, and priority matrix organization.
+                </p>
+                <div class="tool-tags">
+                    <span class="tool-tag">Assignments</span>
+                    <span class="tool-tag">Deadlines</span>
+                    <span class="tool-tag">Progress</span>
+                </div>
+            </div>
+            
+            <!-- Grade Tracker -->
+            <div class="tool-card scroll-reveal hover-lift" data-tool="grade-tracker">
+                <div class="tool-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3 class="tool-title">Grade Tracker</h3>
+                <p class="tool-description">
+                    Subject-wise performance analytics with trend graphs and improvement recommendations.
+                </p>
+                <div class="tool-tags">
+                    <span class="tool-tag">Analytics</span>
+                    <span class="tool-tag">Performance</span>
+                    <span class="tool-tag">Trends</span>
+                </div>
+            </div>
+            
+            <!-- Timetable Generator -->
+            <div class="tool-card scroll-reveal hover-lift" data-tool="timetable-generator">
+                <div class="tool-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <h3 class="tool-title">Timetable Generator</h3>
+                <p class="tool-description">
+                    Create optimized class schedules with drag-drop interface and conflict detection.
+                </p>
+                <div class="tool-tags">
+                    <span class="tool-tag">Schedule</span>
+                    <span class="tool-tag">Classes</span>
+                    <span class="tool-tag">Organization</span>
+                </div>
+            </div>
+            
+            <!-- Exam Countdown -->
+            <div class="tool-card scroll-reveal hover-lift" data-tool="exam-countdown">
+                <div class="tool-icon">
+                    <i class="fas fa-hourglass-half"></i>
+                </div>
+                <h3 class="tool-title">Exam Countdown</h3>
+                <p class="tool-description">
+                    Multi-exam timer with preparation milestone tracking and study reminders.
+                </p>
+                <div class="tool-tags">
+                    <span class="tool-tag">Exams</span>
+                    <span class="tool-tag">Timer</span>
+                    <span class="tool-tag">Preparation</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Productivity Powerhouse -->
+<section class="category-section py-16">
+    <div class="container mx-auto px-6">
+        <div class="text-center mb-12">
+            <h2 class="category-title">⚡ Productivity Powerhouse</h2>
+            <p class="category-subtitle">Boost your efficiency and focus</p>
+        </div>
+        
+        <div class="tools-grid stagger-animation">
+            <!-- Pomodoro Timer -->
+            <div class="tool-card scroll-reveal hover-lift" data-tool="pomodoro-timer">
+                <div class="tool-icon">
+                    <i class="fas fa-stopwatch"></i>
+                </div>
+                <h3 class="tool-title">Pomodoro Timer</h3>
+                <p class="tool-description">
+                    Customizable focus intervals with ambient sounds and productivity analytics tracking.
+                </p>
+                <div class="tool-tags">
+                    <span class="tool-tag">Focus</span>
+                    <span class="tool-tag">Timer</span>
+                    <span class="tool-tag">Productivity</span>
+                </div>
+            </div>
+            
+            <!-- Habit Tracker -->
+            <div class="tool-card scroll-reveal hover-lift" data-tool="habit-tracker">
+                <div class="tool-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h3 class="tool-title">Habit Tracker</h3>
+                <p class="tool-description">
+                    Build lasting habits with 21-day challenges, streak rewards, and progress visualization.
+                </p>
+                <div class="tool-tags">
+                    <span class="tool-tag">Habits</span>
+                    <span class="tool-tag">Goals</span>
+                    <span class="tool-tag">Tracking</span>
+                </div>
+            </div>
+            
+            <!-- Word Counter -->
+            <div class="tool-card" data-category="productivity" data-tags="text analysis writing">
+                <div class="tool-icon">
+                    <i class="fas fa-font"></i>
+                </div>
+                <h3 class="tool-title">Word Counter</h3>
+                <p class="tool-description">Analyze text with detailed statistics and readability metrics</p>
+                <div class="tool-tags">
+                    <span class="tag">Text Analysis</span>
+                    <span class="tag">Writing</span>
+                </div>
+                <a href="/tools/word-counter" class="tool-link">Use Tool</a>
+            </div>
+
+            <!-- Password Manager -->
+            <div class="tool-card" data-category="security" data-tags="password security generator">
+                <div class="tool-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3 class="tool-title">Password Manager</h3>
+                <p class="tool-description">Generate secure passwords and analyze password strength</p>
+                <div class="tool-tags">
+                    <span class="tag">Security</span>
+                    <span class="tag">Generator</span>
+                </div>
+                <a href="/tools/password-manager" class="tool-link">Use Tool</a>
+            </div>
+
+            <!-- Flashcard Maker -->
+            <div class="tool-card" data-category="study" data-tags="flashcards learning memory">
+                <div class="tool-icon">
+                    <i class="fas fa-layer-group"></i>
+                </div>
+                <h3 class="tool-title">Flashcard Maker</h3>
+                <p class="tool-description">Create, study, and manage digital flashcards for effective learning</p>
+                <div class="tool-tags">
+                    <span class="tag">Learning</span>
+                    <span class="tag">Memory</span>
+                </div>
+                <a href="/tools/flashcard-maker" class="tool-link">Use Tool</a>
+            </div>
+
+            <!-- Note Taking -->
+            <div class="tool-card" data-category="productivity" data-tags="notes organization writing">
+                <div class="tool-icon">
+                    <i class="fas fa-sticky-note"></i>
+                </div>
+                <h3 class="tool-title">Note Taking</h3>
+                <p class="tool-description">Organize your thoughts with smart digital notes</p>
+                <div class="tool-tags">
+                    <span class="tag">Organization</span>
+                    <span class="tag">Writing</span>
+                </div>
+                <a href="/tools/note-taking" class="tool-link">Use Tool</a>
+            </div>
+            
+            <!-- Coming Soon Tools -->
+            <div class="tool-card coming-soon" data-category="productivity">
+                <div class="tool-icon">
+                    <i class="fas fa-bullseye"></i>
+                </div>
+                <h3 class="tool-title">Goal Setter</h3>
+                <p class="tool-description">
+                    SMART goals framework with action step breakdowns and milestone celebrations.
+                </p>
+                <div class="tool-tags">
+                    <span class="tag">Goals</span>
+                    <span class="tag">SMART</span>
+                    <span class="tag">Planning</span>
+                </div>
+                <div class="coming-soon-badge">Coming Soon</div>
+            </div>
+            
+            <div class="tool-card coming-soon" data-category="productivity">
+                <div class="tool-icon">
+                    <i class="fas fa-calendar-day"></i>
+                </div>
+                <h3 class="tool-title">Daily Planner</h3>
+                <p class="tool-description">
+                    Hour-by-hour schedule planning with task prioritization and time blocking features.
+                </p>
+                <div class="tool-tags">
+                    <span class="tag">Planning</span>
+                    <span class="tag">Schedule</span>
+                    <span class="tag">Daily</span>
+                </div>
+                <div class="coming-soon-badge">Coming Soon</div>
+            </div>
+            
+            <div class="tool-card coming-soon" data-category="productivity">
+                <div class="tool-icon">
+                    <i class="fas fa-eye"></i>
+                </div>
+                <h3 class="tool-title">Focus Mode</h3>
+                <p class="tool-description">
+                    Block distracting websites and apps with productivity analytics and focus insights.
+                </p>
+                <div class="tool-tags">
+                    <span class="tag">Focus</span>
+                    <span class="tag">Blocking</span>
+                    <span class="tag">Analytics</span>
+                </div>
+                <div class="coming-soon-badge">Coming Soon</div>
+            </div>
+            
+            <div class="tool-card coming-soon" data-category="creativity">
+                <div class="tool-icon">
+                    <i class="fas fa-project-diagram"></i>
+                </div>
+                <h3 class="tool-title">Mind Map Creator</h3>
+                <p class="tool-description">
+                    Create interactive mind maps with collaboration features and export options.
+                </p>
+                <div class="tool-tags">
+                    <span class="tag">Mind Maps</span>
+                    <span class="tag">Visual</span>
+                    <span class="tag">Collaboration</span>
+                </div>
+                <div class="coming-soon-badge">Coming Soon</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Essential Utilities -->
+<section class="category-section py-16">
+    <div class="container mx-auto px-6">
+        <div class="text-center mb-12">
+            <h2 class="category-title">🛠 Essential Utilities</h2>
+            <p class="category-subtitle">Powerful tools for everyday tasks</p>
+        </div>
+        
+        <div class="tools-grid stagger-animation">
+            <!-- PDF Toolkit -->
+            <div class="tool-card" data-category="utilities" data-tags="pdf merge split">
+                <div class="tool-icon">
+                    <i class="fas fa-file-pdf"></i>
+                </div>
+                <h3 class="tool-title">PDF Toolkit</h3>
+                <p class="tool-description">
+                    Merge, split, compress, watermark, and convert PDFs with advanced editing features.
+                </p>
+                <div class="tool-tags">
+                    <span class="tag">PDF</span>
+                    <span class="tag">Merge</span>
+                    <span class="tag">Convert</span>
+                </div>
+                <a href="/tools/pdf-toolkit" class="tool-link">Use Tool</a>
+            </div>
+            
+            <!-- Image Editor -->
+            <div class="tool-card coming-soon" data-category="utilities">
+                <div class="tool-icon">
+                    <i class="fas fa-image"></i>
+                </div>
+                <h3 class="tool-title">Image Editor</h3>
+                <p class="tool-description">
+                    Resize, crop, apply filters, and optimize images with format conversion support.
+                </p>
+                <div class="tool-tags">
+                    <span class="tag">Images</span>
+                    <span class="tag">Editing</span>
+                    <span class="tag">Filters</span>
+                </div>
+                <div class="coming-soon-badge">Coming Soon</div>
+            </div>
+            
+            <!-- QR Code Generator -->
+            <div class="tool-card coming-soon" data-category="utilities">
+                <div class="tool-icon">
+                    <i class="fas fa-qrcode"></i>
+                </div>
+                <h3 class="tool-title">QR Code Generator</h3>
+                <p class="tool-description">
+                    Generate custom QR codes with logos, colors, and analytics tracking capabilities.
+                </p>
+                <div class="tool-tags">
+                    <span class="tag">QR Code</span>
+                    <span class="tag">Generator</span>
+                    <span class="tag">Custom</span>
+                </div>
+                <div class="coming-soon-badge">Coming Soon</div>
+            </div>
+            
+            <!-- Unit Converter -->
+            <div class="tool-card" data-category="utilities" data-tags="conversion units calculator">
+                <div class="tool-icon">
+                    <i class="fas fa-exchange-alt"></i>
+                </div>
+                <h3 class="tool-title">Unit Converter</h3>
+                <p class="tool-description">
+                    Convert academic units, currency, and scientific measurements with high precision.
+                </p>
+                <div class="tool-tags">
+                    <span class="tag">Conversion</span>
+                    <span class="tag">Units</span>
+                    <span class="tag">Calculator</span>
+                </div>
+                <a href="/tools/unit-converter" class="tool-link">Use Tool</a>
+            </div>
+            
+            <!-- File Organizer -->
+            <div class="tool-card coming-soon" data-category="utilities">
+                <div class="tool-icon">
+                    <i class="fas fa-folder-open"></i>
+                </div>
+                <h3 class="tool-title">File Organizer</h3>
+                <p class="tool-description">
+                    Bulk rename, sort, and categorize files by type with automated organization rules.
+                </p>
+                <div class="tool-tags">
+                    <span class="tag">Files</span>
+                    <span class="tag">Organization</span>
+                    <span class="tag">Automation</span>
+                </div>
+                <div class="coming-soon-badge">Coming Soon</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Research & Writing Hub -->
+<section class="category-section py-16">
+    <div class="container mx-auto px-6">
+        <div class="text-center mb-12">
+            <h2 class="category-title">📖 Research & Writing Hub</h2>
+            <p class="category-subtitle">Academic writing and research made easy</p>
+        </div>
+        
+        <div class="tools-grid stagger-animation">
+            <!-- Citation Generator -->
+            <div class="tool-card scroll-reveal hover-lift" data-tool="citation-generator">
+                <div class="tool-icon">
+                    <i class="fas fa-quote-right"></i>
+                </div>
+                <h3 class="tool-title">Citation Generator</h3>
+                <p class="tool-description">
+                    Generate APA, MLA, Chicago, Harvard citations with URL import and bibliography creation.
+                </p>
+                <div class="tool-tags">
+                    <span class="tool-tag">Citations</span>
+                    <span class="tool-tag">APA</span>
+                    <span class="tool-tag">MLA</span>
+                </div>
+            </div>
+            
+            <!-- Word Counter -->
+            <div class="tool-card scroll-reveal hover-lift" data-tool="word-counter">
+                <div class="tool-icon">
+                    <i class="fas fa-sort-numeric-up"></i>
+                </div>
+                <h3 class="tool-title">Word Counter</h3>
+                <p class="tool-description">
+                    Count words, characters, paragraphs with reading time analysis and writing statistics.
+                </p>
+                <div class="tool-tags">
+                    <span class="tool-tag">Word Count</span>
+                    <span class="tool-tag">Statistics</span>
+                    <span class="tool-tag">Analysis</span>
+                </div>
+            </div>
+            
+            <!-- Grammar Checker -->
+            <div class="tool-card scroll-reveal hover-lift" data-tool="grammar-checker">
+                <div class="tool-icon">
+                    <i class="fas fa-spell-check"></i>
+                </div>
+                <h3 class="tool-title">Grammar Checker</h3>
+                <p class="tool-description">
+                    Real-time grammar corrections with style suggestions and writing improvement tips.
+                </p>
+                <div class="tool-tags">
+                    <span class="tool-tag">Grammar</span>
+                    <span class="tool-tag">Writing</span>
+                    <span class="tool-tag">Corrections</span>
+                </div>
+            </div>
+            
+            <!-- Research Organizer -->
+            <div class="tool-card scroll-reveal hover-lift" data-tool="research-organizer">
+                <div class="tool-icon">
+                    <i class="fas fa-search"></i>
+                </div>
+                <h3 class="tool-title">Research Organizer</h3>
+                <p class="tool-description">
+                    Organize research notes with source linking, categories, and collaborative features.
+                </p>
+                <div class="tool-tags">
+                    <span class="tool-tag">Research</span>
+                    <span class="tool-tag">Notes</span>
+                    <span class="tool-tag">Organization</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-20 bg-gradient-to-r from-primary/20 to-secondary/20">
+    <div class="container mx-auto px-6 text-center">
+        <h2 class="text-4xl font-bold mb-4">Ready to Transform Your Study Experience?</h2>
+        <p class="text-xl text-gray-300 mb-8">Join thousands of students who are already using DiskTools to excel in their academics.</p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="#tools" class="btn-primary">
+                <i class="fas fa-rocket mr-2"></i>
+                Start Using Tools
+            </a>
+            <a href="#contact" class="btn-secondary">
+                <i class="fas fa-envelope mr-2"></i>
+                Get Support
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // Initialize tool search and animations
+    document.addEventListener('DOMContentLoaded', function() {
+        // Stagger tool card animations
+        const toolCards = document.querySelectorAll('.tool-card');
+        toolCards.forEach((card, index) => {
+            card.style.animationDelay = `${index * 0.1}s`;
+        });
+        
+        // Initialize search functionality
+        const searchInput = document.getElementById('toolSearch');
+        const resultsDiv = document.getElementById('searchResults');
+        
+        if (searchInput && resultsDiv) {
+            const updateResultsCount = () => {
+                const visibleCards = document.querySelectorAll('.tool-card:not([style*="display: none"])');
+                resultsDiv.textContent = `${visibleCards.length} tools available`;
+            };
+            
+            updateResultsCount();
+            
+            searchInput.addEventListener('input', updateResultsCount);
+        }
+    });
+</script>
+{% endblock %}

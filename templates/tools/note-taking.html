@@ -1,0 +1,717 @@
+{% extends "base.html" %}
+
+{% block title %}Note Taking - DiskTools{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-6 py-12">
+    <!-- Header -->
+    <div class="text-center mb-12">
+        <div class="inline-block p-4 bg-gradient-to-r from-primary to-secondary rounded-full mb-6">
+            <i class="fas fa-sticky-note text-4xl text-white"></i>
+        </div>
+        <h1 class="text-4xl font-bold mb-4 text-gradient">Note Taking</h1>
+        <p class="text-xl text-gray-300">Organize your thoughts with smart digital notes</p>
+    </div>
+
+    <!-- Main Interface -->
+    <div class="max-w-7xl mx-auto">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <!-- Sidebar -->
+            <div class="lg:col-span-1 space-y-6">
+                <!-- Search -->
+                <div class="glass rounded-2xl p-4">
+                    <div class="relative">
+                        <input id="searchNotes" type="text" placeholder="Search notes..." class="w-full p-3 bg-dark/50 border border-white/20 rounded-xl text-white pl-10">
+                        <i class="fas fa-search absolute left-3 top-4 text-gray-400"></i>
+                    </div>
+                </div>
+                
+                <!-- Categories -->
+                <div class="glass rounded-2xl p-4">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-bold">Categories</h3>
+                        <button id="addCategoryBtn" class="text-primary hover:text-primary/80">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                    <div id="categoriesList" class="space-y-2">
+                        <div class="category-item active" data-category="all">
+                            <i class="fas fa-list mr-2"></i>All Notes
+                            <span class="count">0</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Notes List -->
+                <div class="glass rounded-2xl p-4">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-bold">Notes</h3>
+                        <button id="newNoteBtn" class="btn-primary text-sm px-3 py-1">
+                            <i class="fas fa-plus mr-1"></i>New
+                        </button>
+                    </div>
+                    <div id="notesList" class="space-y-2 max-h-96 overflow-y-auto">
+                        <p class="text-gray-400 text-sm text-center py-4">No notes yet</p>
+                    </div>
+                </div>
+                
+                <!-- Quick Actions -->
+                <div class="glass rounded-2xl p-4">
+                    <h3 class="font-bold mb-4">Quick Actions</h3>
+                    <div class="space-y-2">
+                        <button id="exportNotes" class="w-full btn-secondary text-sm">
+                            <i class="fas fa-download mr-2"></i>Export Notes
+                        </button>
+                        <button id="importNotes" class="w-full btn-secondary text-sm">
+                            <i class="fas fa-upload mr-2"></i>Import Notes
+                        </button>
+                        <button id="backupNotes" class="w-full btn-secondary text-sm">
+                            <i class="fas fa-shield-alt mr-2"></i>Backup
+                        </button>
+                    </div>
+                    <input type="file" id="importFile" accept=".json" class="hidden">
+                </div>
+            </div>
+            
+            <!-- Main Editor -->
+            <div class="lg:col-span-3">
+                <div class="glass rounded-2xl p-6 h-full">
+                    <!-- Editor Header -->
+                    <div id="editorHeader" class="flex justify-between items-center mb-6 pb-4 border-b border-white/10">
+                        <div class="flex-1">
+                            <input id="noteTitle" type="text" placeholder="Untitled Note" class="text-2xl font-bold bg-transparent border-none text-white w-full focus:outline-none">
+                            <div class="flex items-center space-x-4 mt-2 text-sm text-gray-400">
+                                <select id="noteCategory" class="bg-dark/50 border border-white/20 rounded px-2 py-1 text-white">
+                                    <option value="">No Category</option>
+                                </select>
+                                <div id="noteStats" class="flex space-x-4">
+                                    <span id="wordCount">0 words</span>
+                                    <span id="charCount">0 characters</span>
+                                    <span id="lastSaved">Never saved</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button id="saveNote" class="btn-primary">
+                                <i class="fas fa-save mr-2"></i>Save
+                            </button>
+                            <button id="deleteNote" class="btn-secondary text-red-400">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Toolbar -->
+                    <div class="flex flex-wrap items-center space-x-2 mb-4 pb-4 border-b border-white/10">
+                        <!-- Format buttons -->
+                        <button class="toolbar-btn" data-command="bold" title="Bold">
+                            <i class="fas fa-bold"></i>
+                        </button>
+                        <button class="toolbar-btn" data-command="italic" title="Italic">
+                            <i class="fas fa-italic"></i>
+                        </button>
+                        <button class="toolbar-btn" data-command="underline" title="Underline">
+                            <i class="fas fa-underline"></i>
+                        </button>
+                        <div class="border-l border-white/20 h-6 mx-2"></div>
+                        
+                        <!-- List buttons -->
+                        <button class="toolbar-btn" data-command="insertUnorderedList" title="Bullet List">
+                            <i class="fas fa-list-ul"></i>
+                        </button>
+                        <button class="toolbar-btn" data-command="insertOrderedList" title="Numbered List">
+                            <i class="fas fa-list-ol"></i>
+                        </button>
+                        <div class="border-l border-white/20 h-6 mx-2"></div>
+                        
+                        <!-- Alignment -->
+                        <button class="toolbar-btn" data-command="justifyLeft" title="Align Left">
+                            <i class="fas fa-align-left"></i>
+                        </button>
+                        <button class="toolbar-btn" data-command="justifyCenter" title="Align Center">
+                            <i class="fas fa-align-center"></i>
+                        </button>
+                        <button class="toolbar-btn" data-command="justifyRight" title="Align Right">
+                            <i class="fas fa-align-right"></i>
+                        </button>
+                        <div class="border-l border-white/20 h-6 mx-2"></div>
+                        
+                        <!-- Insert -->
+                        <button class="toolbar-btn" id="insertLink" title="Insert Link">
+                            <i class="fas fa-link"></i>
+                        </button>
+                        <button class="toolbar-btn" id="insertImage" title="Insert Image">
+                            <i class="fas fa-image"></i>
+                        </button>
+                        <button class="toolbar-btn" id="insertTable" title="Insert Table">
+                            <i class="fas fa-table"></i>
+                        </button>
+                        <div class="border-l border-white/20 h-6 mx-2"></div>
+                        
+                        <!-- View -->
+                        <button class="toolbar-btn" id="togglePreview" title="Toggle Preview">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="toolbar-btn" id="fullscreen" title="Fullscreen">
+                            <i class="fas fa-expand"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- Editor Content -->
+                    <div class="relative flex-1">
+                        <div id="noteEditor" contenteditable="true" class="w-full h-96 p-4 bg-dark/30 rounded-xl text-white focus:outline-none overflow-y-auto" style="min-height: 400px;">
+                            <p>Start typing your note here...</p>
+                        </div>
+                        
+                        <!-- Preview Mode -->
+                        <div id="notePreview" class="hidden w-full h-96 p-4 bg-dark/30 rounded-xl text-white overflow-y-auto" style="min-height: 400px;">
+                            <!-- Preview content will be displayed here -->
+                        </div>
+                    </div>
+                    
+                    <!-- Tags -->
+                    <div class="mt-4 pt-4 border-t border-white/10">
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-tags text-gray-400"></i>
+                            <input id="noteTags" type="text" placeholder="Add tags (comma separated)" class="flex-1 bg-transparent border-none text-white focus:outline-none">
+                        </div>
+                        <div id="tagsDisplay" class="flex flex-wrap gap-2 mt-2">
+                            <!-- Tags will be displayed here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modals -->
+<!-- Add Category Modal -->
+<div id="addCategoryModal" class="modal">
+    <div class="modal-content">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-xl font-bold">Add Category</h3>
+            <button class="modal-close text-gray-400 hover:text-white">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div class="space-y-4">
+            <div>
+                <label class="block text-sm text-gray-300 mb-2">Category Name</label>
+                <input id="categoryName" type="text" class="w-full p-3 bg-dark/50 border border-white/20 rounded-xl text-white" placeholder="Enter category name...">
+            </div>
+            <div>
+                <label class="block text-sm text-gray-300 mb-2">Color</label>
+                <div class="flex space-x-2">
+                    <button class="color-btn" data-color="#667eea" style="background-color: #667eea;"></button>
+                    <button class="color-btn" data-color="#764ba2" style="background-color: #764ba2;"></button>
+                    <button class="color-btn" data-color="#f093fb" style="background-color: #f093fb;"></button>
+                    <button class="color-btn" data-color="#f5576c" style="background-color: #f5576c;"></button>
+                    <button class="color-btn" data-color="#4facfe" style="background-color: #4facfe;"></button>
+                    <button class="color-btn" data-color="#43e97b" style="background-color: #43e97b;"></button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="flex justify-end space-x-3 mt-6">
+            <button class="modal-close btn-secondary">Cancel</button>
+            <button id="saveCategory" class="btn-primary">Add Category</button>
+        </div>
+    </div>
+</div>
+
+<!-- Insert Link Modal -->
+<div id="linkModal" class="modal">
+    <div class="modal-content">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-xl font-bold">Insert Link</h3>
+            <button class="modal-close text-gray-400 hover:text-white">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div class="space-y-4">
+            <div>
+                <label class="block text-sm text-gray-300 mb-2">Link Text</label>
+                <input id="linkText" type="text" class="w-full p-3 bg-dark/50 border border-white/20 rounded-xl text-white" placeholder="Enter link text...">
+            </div>
+            <div>
+                <label class="block text-sm text-gray-300 mb-2">URL</label>
+                <input id="linkUrl" type="url" class="w-full p-3 bg-dark/50 border border-white/20 rounded-xl text-white" placeholder="https://example.com">
+            </div>
+        </div>
+        
+        <div class="flex justify-end space-x-3 mt-6">
+            <button class="modal-close btn-secondary">Cancel</button>
+            <button id="insertLinkBtn" class="btn-primary">Insert Link</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+class NoteTaking {
+    constructor() {
+        this.notes = JSON.parse(localStorage.getItem('disktools-notes') || '[]');
+        this.categories = JSON.parse(localStorage.getItem('disktools-note-categories') || '[]');
+        this.currentNote = null;
+        this.isPreviewMode = false;
+        this.selectedColor = '#667eea';
+        this.init();
+    }
+
+    init() {
+        this.setupEventListeners();
+        this.updateCategoriesList();
+        this.updateNotesList();
+        this.updateStats();
+        this.createNewNote();
+    }
+
+    setupEventListeners() {
+        // Note management
+        document.getElementById('newNoteBtn').addEventListener('click', () => this.createNewNote());
+        document.getElementById('saveNote').addEventListener('click', () => this.saveCurrentNote());
+        document.getElementById('deleteNote').addEventListener('click', () => this.deleteCurrentNote());
+
+        // Categories
+        document.getElementById('addCategoryBtn').addEventListener('click', () => this.showAddCategoryModal());
+        document.getElementById('saveCategory').addEventListener('click', () => this.saveCategory());
+
+        // Search
+        document.getElementById('searchNotes').addEventListener('input', (e) => this.searchNotes(e.target.value));
+
+        // Editor
+        document.getElementById('noteEditor').addEventListener('input', () => this.updateWordCount());
+        document.getElementById('noteTitle').addEventListener('input', () => this.updateCurrentNote());
+        document.getElementById('noteCategory').addEventListener('change', () => this.updateCurrentNote());
+        document.getElementById('noteTags').addEventListener('input', () => this.updateTags());
+
+        // Toolbar
+        document.querySelectorAll('.toolbar-btn[data-command]').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.execCommand(btn.dataset.command);
+            });
+        });
+
+        document.getElementById('insertLink').addEventListener('click', () => this.showLinkModal());
+        document.getElementById('insertLinkBtn').addEventListener('click', () => this.insertLink());
+        document.getElementById('togglePreview').addEventListener('click', () => this.togglePreview());
+        document.getElementById('fullscreen').addEventListener('click', () => this.toggleFullscreen());
+
+        // Import/Export
+        document.getElementById('exportNotes').addEventListener('click', () => this.exportNotes());
+        document.getElementById('importNotes').addEventListener('click', () => {
+            document.getElementById('importFile').click();
+        });
+        document.getElementById('importFile').addEventListener('change', (e) => this.importNotes(e));
+        document.getElementById('backupNotes').addEventListener('click', () => this.backupNotes());
+
+        // Color selection
+        document.querySelectorAll('.color-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                this.selectedColor = btn.dataset.color;
+            });
+        });
+
+        // Modal controls
+        document.querySelectorAll('.modal-close').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.target.closest('.modal').classList.add('hidden');
+            });
+        });
+
+        // Auto-save
+        setInterval(() => {
+            if (this.currentNote && this.hasUnsavedChanges()) {
+                this.saveCurrentNote(true);
+            }
+        }, 30000); // Auto-save every 30 seconds
+    }
+
+    createNewNote() {
+        this.currentNote = {
+            id: Date.now().toString(),
+            title: '',
+            content: '',
+            category: '',
+            tags: [],
+            created: new Date().toISOString(),
+            modified: new Date().toISOString()
+        };
+
+        document.getElementById('noteTitle').value = '';
+        document.getElementById('noteEditor').innerHTML = '<p>Start typing your note here...</p>';
+        document.getElementById('noteCategory').value = '';
+        document.getElementById('noteTags').value = '';
+        
+        this.updateWordCount();
+        this.updateTags();
+        this.updateLastSaved();
+    }
+
+    saveCurrentNote(isAutoSave = false) {
+        if (!this.currentNote) return;
+
+        this.currentNote.title = document.getElementById('noteTitle').value || 'Untitled Note';
+        this.currentNote.content = document.getElementById('noteEditor').innerHTML;
+        this.currentNote.category = document.getElementById('noteCategory').value;
+        this.currentNote.modified = new Date().toISOString();
+
+        const existingIndex = this.notes.findIndex(note => note.id === this.currentNote.id);
+        
+        if (existingIndex >= 0) {
+            this.notes[existingIndex] = this.currentNote;
+        } else {
+            this.notes.unshift(this.currentNote);
+        }
+
+        this.saveNotes();
+        this.updateNotesList();
+        this.updateStats();
+        this.updateLastSaved();
+
+        if (!isAutoSave) {
+            ToolAPI.showSuccess('Note saved successfully');
+        }
+    }
+
+    deleteCurrentNote() {
+        if (!this.currentNote) return;
+
+        if (confirm('Are you sure you want to delete this note?')) {
+            this.notes = this.notes.filter(note => note.id !== this.currentNote.id);
+            this.saveNotes();
+            this.updateNotesList();
+            this.updateStats();
+            this.createNewNote();
+            ToolAPI.showSuccess('Note deleted successfully');
+        }
+    }
+
+    loadNote(noteId) {
+        const note = this.notes.find(n => n.id === noteId);
+        if (!note) return;
+
+        this.currentNote = note;
+        
+        document.getElementById('noteTitle').value = note.title;
+        document.getElementById('noteEditor').innerHTML = note.content;
+        document.getElementById('noteCategory').value = note.category || '';
+        document.getElementById('noteTags').value = note.tags.join(', ');
+        
+        this.updateWordCount();
+        this.updateTags();
+        this.updateLastSaved();
+
+        // Highlight selected note
+        document.querySelectorAll('.note-item').forEach(item => item.classList.remove('active'));
+        document.querySelector(`[data-note-id="${noteId}"]`)?.classList.add('active');
+    }
+
+    showAddCategoryModal() {
+        document.getElementById('addCategoryModal').classList.remove('hidden');
+        document.getElementById('categoryName').focus();
+    }
+
+    saveCategory() {
+        const name = document.getElementById('categoryName').value.trim();
+        
+        if (!name) {
+            ToolAPI.showError('Please enter a category name');
+            return;
+        }
+
+        const category = {
+            id: Date.now().toString(),
+            name: name,
+            color: this.selectedColor,
+            count: 0
+        };
+
+        this.categories.push(category);
+        this.saveCategories();
+        this.updateCategoriesList();
+        this.updateCategorySelects();
+
+        document.getElementById('addCategoryModal').classList.add('hidden');
+        document.getElementById('categoryName').value = '';
+        
+        ToolAPI.showSuccess('Category added successfully');
+    }
+
+    searchNotes(query) {
+        const filteredNotes = query 
+            ? this.notes.filter(note => 
+                note.title.toLowerCase().includes(query.toLowerCase()) ||
+                note.content.toLowerCase().includes(query.toLowerCase()) ||
+                note.tags.some(tag => tag.toLowerCase().includes(query.toLowerCase()))
+            )
+            : this.notes;
+        
+        this.displayNotes(filteredNotes);
+    }
+
+    filterByCategory(categoryId) {
+        document.querySelectorAll('.category-item').forEach(item => item.classList.remove('active'));
+        document.querySelector(`[data-category="${categoryId}"]`).classList.add('active');
+
+        const filteredNotes = categoryId === 'all' 
+            ? this.notes 
+            : this.notes.filter(note => note.category === categoryId);
+        
+        this.displayNotes(filteredNotes);
+    }
+
+    updateWordCount() {
+        const content = document.getElementById('noteEditor').textContent || '';
+        const words = content.trim() ? content.trim().split(/\s+/).length : 0;
+        const chars = content.length;
+        
+        document.getElementById('wordCount').textContent = `${words} words`;
+        document.getElementById('charCount').textContent = `${chars} characters`;
+    }
+
+    updateTags() {
+        const tagsInput = document.getElementById('noteTags').value;
+        const tags = tagsInput.split(',').map(tag => tag.trim()).filter(tag => tag);
+        
+        if (this.currentNote) {
+            this.currentNote.tags = tags;
+        }
+        
+        const tagsDisplay = document.getElementById('tagsDisplay');
+        tagsDisplay.innerHTML = tags.map(tag => `
+            <span class="px-2 py-1 bg-primary/20 text-primary rounded text-sm">${tag}</span>
+        `).join('');
+    }
+
+    updateLastSaved() {
+        const lastSaved = this.currentNote?.modified 
+            ? new Date(this.currentNote.modified).toLocaleString()
+            : 'Never saved';
+        
+        document.getElementById('lastSaved').textContent = lastSaved;
+    }
+
+    updateCategoriesList() {
+        const container = document.getElementById('categoriesList');
+        const allCount = this.notes.length;
+        
+        let html = `
+            <div class="category-item active" data-category="all" onclick="noteTaking.filterByCategory('all')">
+                <i class="fas fa-list mr-2"></i>All Notes
+                <span class="count">${allCount}</span>
+            </div>
+        `;
+        
+        this.categories.forEach(category => {
+            const count = this.notes.filter(note => note.category === category.id).length;
+            html += `
+                <div class="category-item" data-category="${category.id}" onclick="noteTaking.filterByCategory('${category.id}')">
+                    <div class="w-3 h-3 rounded-full mr-2" style="background-color: ${category.color};"></div>
+                    ${category.name}
+                    <span class="count">${count}</span>
+                </div>
+            `;
+        });
+        
+        container.innerHTML = html;
+        this.updateCategorySelects();
+    }
+
+    updateCategorySelects() {
+        const select = document.getElementById('noteCategory');
+        const currentValue = select.value;
+        
+        select.innerHTML = '<option value="">No Category</option>';
+        
+        this.categories.forEach(category => {
+            const option = document.createElement('option');
+            option.value = category.id;
+            option.textContent = category.name;
+            select.appendChild(option);
+        });
+        
+        select.value = currentValue;
+    }
+
+    updateNotesList() {
+        this.displayNotes(this.notes);
+    }
+
+    displayNotes(notes) {
+        const container = document.getElementById('notesList');
+        
+        if (notes.length === 0) {
+            container.innerHTML = '<p class="text-gray-400 text-sm text-center py-4">No notes found</p>';
+            return;
+        }
+        
+        container.innerHTML = notes.map(note => {
+            const category = this.categories.find(cat => cat.id === note.category);
+            const preview = note.content.replace(/<[^>]*>/g, '').substring(0, 100);
+            
+            return `
+                <div class="note-item" data-note-id="${note.id}" onclick="noteTaking.loadNote('${note.id}')">
+                    <div class="font-semibold text-sm mb-1">${note.title || 'Untitled'}</div>
+                    <div class="text-xs text-gray-400 mb-2">${preview}${preview.length >= 100 ? '...' : ''}</div>
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-gray-500">${new Date(note.modified).toLocaleDateString()}</span>
+                        ${category ? `<span class="px-2 py-1 rounded text-xs" style="background-color: ${category.color}20; color: ${category.color};">${category.name}</span>` : ''}
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    updateStats() {
+        // Update any statistics displays
+    }
+
+    execCommand(command) {
+        document.execCommand(command, false, null);
+        document.getElementById('noteEditor').focus();
+    }
+
+    showLinkModal() {
+        document.getElementById('linkModal').classList.remove('hidden');
+        document.getElementById('linkText').focus();
+    }
+
+    insertLink() {
+        const text = document.getElementById('linkText').value;
+        const url = document.getElementById('linkUrl').value;
+        
+        if (!text || !url) {
+            ToolAPI.showError('Please enter both link text and URL');
+            return;
+        }
+        
+        document.execCommand('insertHTML', false, `<a href="${url}" target="_blank">${text}</a>`);
+        
+        document.getElementById('linkModal').classList.add('hidden');
+        document.getElementById('linkText').value = '';
+        document.getElementById('linkUrl').value = '';
+    }
+
+    togglePreview() {
+        const editor = document.getElementById('noteEditor');
+        const preview = document.getElementById('notePreview');
+        const toggleBtn = document.getElementById('togglePreview');
+        
+        this.isPreviewMode = !this.isPreviewMode;
+        
+        if (this.isPreviewMode) {
+            preview.innerHTML = editor.innerHTML;
+            editor.classList.add('hidden');
+            preview.classList.remove('hidden');
+            toggleBtn.innerHTML = '<i class="fas fa-edit"></i>';
+        } else {
+            editor.classList.remove('hidden');
+            preview.classList.add('hidden');
+            toggleBtn.innerHTML = '<i class="fas fa-eye"></i>';
+        }
+    }
+
+    toggleFullscreen() {
+        const editor = document.querySelector('.lg\\:col-span-3 .glass');
+        
+        if (!document.fullscreenElement) {
+            editor.requestFullscreen();
+        } else {
+            document.exitFullscreen();
+        }
+    }
+
+    exportNotes() {
+        const dataStr = JSON.stringify(this.notes, null, 2);
+        const dataBlob = new Blob([dataStr], { type: 'application/json' });
+        
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(dataBlob);
+        link.download = `notes-${new Date().toISOString().split('T')[0]}.json`;
+        link.click();
+        
+        ToolAPI.showSuccess('Notes exported successfully');
+    }
+
+    importNotes(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const importedNotes = JSON.parse(e.target.result);
+                
+                if (Array.isArray(importedNotes)) {
+                    this.notes = [...this.notes, ...importedNotes];
+                    this.saveNotes();
+                    this.updateNotesList();
+                    this.updateStats();
+                    ToolAPI.showSuccess(`Imported ${importedNotes.length} notes`);
+                } else {
+                    ToolAPI.showError('Invalid file format');
+                }
+            } catch (error) {
+                ToolAPI.showError('Error reading file');
+            }
+        };
+        reader.readAsText(file);
+    }
+
+    backupNotes() {
+        const backup = {
+            notes: this.notes,
+            categories: this.categories,
+            timestamp: new Date().toISOString()
+        };
+        
+        const dataStr = JSON.stringify(backup, null, 2);
+        const dataBlob = new Blob([dataStr], { type: 'application/json' });
+        
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(dataBlob);
+        link.download = `notes-backup-${new Date().toISOString().split('T')[0]}.json`;
+        link.click();
+        
+        ToolAPI.showSuccess('Backup created successfully');
+    }
+
+    hasUnsavedChanges() {
+        if (!this.currentNote) return false;
+        
+        const currentTitle = document.getElementById('noteTitle').value || 'Untitled Note';
+        const currentContent = document.getElementById('noteEditor').innerHTML;
+        
+        return currentTitle !== this.currentNote.title || currentContent !== this.currentNote.content;
+    }
+
+    updateCurrentNote() {
+        if (this.currentNote) {
+            this.currentNote.modified = new Date().toISOString();
+        }
+    }
+
+    saveNotes() {
+        localStorage.setItem('disktools-notes', JSON.stringify(this.notes));
+    }
+
+    saveCategories() {
+        localStorage.setItem('disktools-note-categories', JSON.stringify(this.categories));
+    }
+}
+
+// Initialize note taking
+let noteTaking;
+document.addEventListener('DOMContentLoaded', () => {
+    noteTaking = new NoteTaking();
+});
+</script>
+{% endblock %}

@@ -1,0 +1,580 @@
+{% extends "base.html" %}
+
+{% block title %}Flashcard Maker - DiskTools{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-6 py-12">
+    <!-- Header -->
+    <div class="text-center mb-12">
+        <div class="inline-block p-4 bg-gradient-to-r from-primary to-secondary rounded-full mb-6">
+            <i class="fas fa-layer-group text-4xl text-white"></i>
+        </div>
+        <h1 class="text-4xl font-bold mb-4 text-gradient">Flashcard Maker</h1>
+        <p class="text-xl text-gray-300">Create, study, and manage digital flashcards for effective learning</p>
+    </div>
+
+    <!-- Main Interface -->
+    <div class="max-w-7xl mx-auto">
+        <!-- Navigation Tabs -->
+        <div class="flex flex-wrap justify-center mb-8">
+            <button class="tab-btn active" data-tab="create">
+                <i class="fas fa-plus mr-2"></i>Create Cards
+            </button>
+            <button class="tab-btn" data-tab="study">
+                <i class="fas fa-brain mr-2"></i>Study Mode
+            </button>
+            <button class="tab-btn" data-tab="manage">
+                <i class="fas fa-folder mr-2"></i>Manage Decks
+            </button>
+        </div>
+
+        <!-- Create Cards Tab -->
+        <div id="createTab" class="tab-content active">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Card Creator -->
+                <div class="lg:col-span-2">
+                    <div class="glass rounded-2xl p-6 mb-6">
+                        <h2 class="text-2xl font-bold mb-6 flex items-center">
+                            <i class="fas fa-edit text-primary mr-3"></i>
+                            Create New Card
+                        </h2>
+                        
+                        <!-- Deck Selection -->
+                        <div class="mb-6">
+                            <label class="block text-sm text-gray-300 mb-2">Select Deck</label>
+                            <div class="flex space-x-2">
+                                <select id="deckSelect" class="flex-1 p-3 bg-dark/50 border border-white/20 rounded-xl text-white">
+                                    <option value="">Select a deck...</option>
+                                </select>
+                                <button id="newDeckBtn" class="px-4 py-3 bg-primary/20 hover:bg-primary/30 rounded-xl transition-colors">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Basic Card Form -->
+                        <div id="basicCardForm">
+                            <div class="mb-4">
+                                <label class="block text-sm text-gray-300 mb-2">Front (Question)</label>
+                                <textarea id="cardFront" rows="4" class="w-full p-3 bg-dark/50 border border-white/20 rounded-xl text-white resize-none" placeholder="Enter the question or prompt..."></textarea>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="block text-sm text-gray-300 mb-2">Back (Answer)</label>
+                                <textarea id="cardBack" rows="4" class="w-full p-3 bg-dark/50 border border-white/20 rounded-xl text-white resize-none" placeholder="Enter the answer or explanation..."></textarea>
+                            </div>
+                        </div>
+                        
+                        <!-- Tags -->
+                        <div class="mb-6">
+                            <label class="block text-sm text-gray-300 mb-2">Tags (optional)</label>
+                            <input id="cardTags" type="text" class="w-full p-3 bg-dark/50 border border-white/20 rounded-xl text-white" placeholder="Enter tags separated by commas...">
+                        </div>
+                        
+                        <!-- Actions -->
+                        <div class="flex space-x-3">
+                            <button id="saveCard" class="btn-primary flex-1">
+                                <i class="fas fa-save mr-2"></i>Save Card
+                            </button>
+                            <button id="previewCard" class="btn-secondary">
+                                <i class="fas fa-eye mr-2"></i>Preview
+                            </button>
+                            <button id="clearCard" class="btn-secondary">
+                                <i class="fas fa-trash mr-2"></i>Clear
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Sidebar -->
+                <div class="space-y-6">
+                    <!-- Quick Stats -->
+                    <div class="glass rounded-2xl p-6">
+                        <h3 class="text-xl font-bold mb-4">Quick Stats</h3>
+                        <div class="space-y-3">
+                            <div class="flex justify-between">
+                                <span class="text-gray-300">Total Decks</span>
+                                <span id="totalDecks" class="font-bold text-primary">0</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-300">Total Cards</span>
+                                <span id="totalCards" class="font-bold text-secondary">0</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Recent Decks -->
+                    <div class="glass rounded-2xl p-6">
+                        <h3 class="text-xl font-bold mb-4">Recent Decks</h3>
+                        <div id="recentDecks" class="space-y-2">
+                            <p class="text-gray-400 text-sm text-center py-4">No decks created yet</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Study Mode Tab -->
+        <div id="studyTab" class="tab-content">
+            <div class="max-w-4xl mx-auto">
+                <!-- Study Options -->
+                <div class="glass rounded-2xl p-6 mb-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm text-gray-300 mb-2">Select Deck</label>
+                            <select id="studyDeckSelect" class="w-full p-3 bg-dark/50 border border-white/20 rounded-xl text-white">
+                                <option value="">Choose deck to study...</option>
+                            </select>
+                        </div>
+                        <div class="flex items-end">
+                            <button id="startStudy" class="btn-primary w-full">
+                                <i class="fas fa-play mr-2"></i>Start Study
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Study Card Display -->
+                <div id="studyArea" class="hidden">
+                    <!-- Progress Bar -->
+                    <div class="mb-6">
+                        <div class="flex justify-between text-sm mb-2">
+                            <span class="text-gray-300">Progress</span>
+                            <span id="studyProgress" class="text-gray-300">0 / 0</span>
+                        </div>
+                        <div class="w-full bg-dark/50 rounded-full h-2">
+                            <div id="studyProgressBar" class="h-2 bg-gradient-to-r from-primary to-secondary rounded-full transition-all duration-300" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Study Card -->
+                    <div class="glass rounded-2xl p-8 mb-6 min-h-96 flex flex-col justify-center">
+                        <div id="cardDisplay" class="text-center">
+                            <!-- Card content will be displayed here -->
+                        </div>
+                        
+                        <!-- Card Actions -->
+                        <div id="cardActions" class="flex justify-center space-x-4 mt-8">
+                            <button id="showAnswer" class="btn-primary">
+                                <i class="fas fa-eye mr-2"></i>Show Answer
+                            </button>
+                        </div>
+                        
+                        <!-- Answer Buttons -->
+                        <div id="answerButtons" class="hidden flex justify-center space-x-4 mt-8">
+                            <button class="answer-btn bg-red-500/20 hover:bg-red-500/30 text-red-400" data-difficulty="again">
+                                <i class="fas fa-times mr-2"></i>Again
+                            </button>
+                            <button class="answer-btn bg-green-500/20 hover:bg-green-500/30 text-green-400" data-difficulty="correct">
+                                <i class="fas fa-check mr-2"></i>Correct
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Study Controls -->
+                    <div class="flex justify-between">
+                        <button id="endStudy" class="btn-secondary">
+                            <i class="fas fa-stop mr-2"></i>End Session
+                        </button>
+                        <button id="skipCard" class="btn-secondary">
+                            <i class="fas fa-forward mr-2"></i>Skip
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Study Complete -->
+                <div id="studyComplete" class="hidden glass rounded-2xl p-8 text-center">
+                    <i class="fas fa-trophy text-6xl text-yellow-400 mb-4"></i>
+                    <h2 class="text-3xl font-bold mb-4">Study Session Complete!</h2>
+                    <div id="studyResults" class="mb-6">
+                        <!-- Results will be displayed here -->
+                    </div>
+                    <button id="studyAgain" class="btn-primary mr-4">
+                        <i class="fas fa-redo mr-2"></i>Study Again
+                    </button>
+                    <button id="backToDecks" class="btn-secondary">
+                        <i class="fas fa-arrow-left mr-2"></i>Back to Decks
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Manage Decks Tab -->
+        <div id="manageTab" class="tab-content">
+            <div class="glass rounded-2xl p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold">My Decks</h2>
+                    <button id="createDeckBtn" class="btn-primary">
+                        <i class="fas fa-plus mr-2"></i>New Deck
+                    </button>
+                </div>
+                
+                <div id="decksList" class="space-y-4">
+                    <!-- Decks will be listed here -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- New Deck Modal -->
+<div id="newDeckModal" class="modal">
+    <div class="modal-content">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-xl font-bold">Create New Deck</h3>
+            <button class="modal-close text-gray-400 hover:text-white">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div class="space-y-4">
+            <div>
+                <label class="block text-sm text-gray-300 mb-2">Deck Name</label>
+                <input id="newDeckName" type="text" class="w-full p-3 bg-dark/50 border border-white/20 rounded-xl text-white" placeholder="Enter deck name...">
+            </div>
+            <div>
+                <label class="block text-sm text-gray-300 mb-2">Description (optional)</label>
+                <textarea id="newDeckDescription" rows="3" class="w-full p-3 bg-dark/50 border border-white/20 rounded-xl text-white resize-none" placeholder="Enter deck description..."></textarea>
+            </div>
+        </div>
+        
+        <div class="flex justify-end space-x-3 mt-6">
+            <button class="modal-close btn-secondary">Cancel</button>
+            <button id="createDeck" class="btn-primary">Create Deck</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+class FlashcardMaker {
+    constructor() {
+        this.decks = JSON.parse(localStorage.getItem('disktools-flashcard-decks') || '[]');
+        this.currentStudyDeck = null;
+        this.currentStudyCards = [];
+        this.currentCardIndex = 0;
+        this.init();
+    }
+
+    init() {
+        this.setupEventListeners();
+        this.updateStats();
+        this.updateDeckSelects();
+        this.updateDecksList();
+        this.updateRecentDecks();
+    }
+
+    setupEventListeners() {
+        // Tab navigation
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                this.switchTab(e.target.dataset.tab);
+            });
+        });
+
+        // Deck management
+        document.getElementById('newDeckBtn').addEventListener('click', () => this.showNewDeckModal());
+        document.getElementById('createDeckBtn').addEventListener('click', () => this.showNewDeckModal());
+        document.getElementById('createDeck').addEventListener('click', () => this.createDeck());
+
+        // Card creation
+        document.getElementById('saveCard').addEventListener('click', () => this.saveCard());
+        document.getElementById('clearCard').addEventListener('click', () => this.clearCard());
+
+        // Study mode
+        document.getElementById('startStudy').addEventListener('click', () => this.startStudySession());
+        document.getElementById('showAnswer').addEventListener('click', () => this.showAnswer());
+        document.getElementById('skipCard').addEventListener('click', () => this.skipCard());
+        document.getElementById('endStudy').addEventListener('click', () => this.endStudy());
+        document.getElementById('studyAgain').addEventListener('click', () => this.startStudySession());
+        document.getElementById('backToDecks').addEventListener('click', () => this.switchTab('manage'));
+
+        // Answer buttons
+        document.querySelectorAll('.answer-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                this.answerCard(e.target.dataset.difficulty);
+            });
+        });
+
+        // Modal controls
+        document.querySelectorAll('.modal-close').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.target.closest('.modal').classList.add('hidden');
+            });
+        });
+    }
+
+    switchTab(tabName) {
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+
+        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+        document.getElementById(`${tabName}Tab`).classList.add('active');
+
+        if (tabName === 'manage') this.updateDecksList();
+    }
+
+    showNewDeckModal() {
+        document.getElementById('newDeckModal').classList.remove('hidden');
+        document.getElementById('newDeckName').focus();
+    }
+
+    createDeck() {
+        const name = document.getElementById('newDeckName').value.trim();
+        const description = document.getElementById('newDeckDescription').value.trim();
+
+        if (!name) {
+            ToolAPI.showError('Please enter a deck name');
+            return;
+        }
+
+        const deck = {
+            id: Date.now().toString(),
+            name: name,
+            description: description,
+            cards: [],
+            created: new Date().toISOString()
+        };
+
+        this.decks.push(deck);
+        this.saveDecks();
+        this.updateDeckSelects();
+        this.updateDecksList();
+        this.updateRecentDecks();
+        this.updateStats();
+
+        document.getElementById('newDeckModal').classList.add('hidden');
+        document.getElementById('newDeckName').value = '';
+        document.getElementById('newDeckDescription').value = '';
+
+        ToolAPI.showSuccess('Deck created successfully');
+    }
+
+    saveCard() {
+        const deckId = document.getElementById('deckSelect').value;
+        if (!deckId) {
+            ToolAPI.showError('Please select a deck');
+            return;
+        }
+
+        const front = document.getElementById('cardFront').value.trim();
+        const back = document.getElementById('cardBack').value.trim();
+        
+        if (!front || !back) {
+            ToolAPI.showError('Please fill in both front and back of the card');
+            return;
+        }
+
+        const card = {
+            id: Date.now().toString(),
+            front: front,
+            back: back,
+            created: new Date().toISOString(),
+            tags: document.getElementById('cardTags').value.split(',').map(tag => tag.trim()).filter(tag => tag)
+        };
+
+        const deck = this.decks.find(d => d.id === deckId);
+        deck.cards.push(card);
+        
+        this.saveDecks();
+        this.updateStats();
+        this.clearCard();
+        
+        ToolAPI.showSuccess('Card saved successfully');
+    }
+
+    clearCard() {
+        document.getElementById('cardFront').value = '';
+        document.getElementById('cardBack').value = '';
+        document.getElementById('cardTags').value = '';
+    }
+
+    startStudySession() {
+        const deckId = document.getElementById('studyDeckSelect').value;
+        if (!deckId) {
+            ToolAPI.showError('Please select a deck to study');
+            return;
+        }
+
+        this.currentStudyDeck = this.decks.find(d => d.id === deckId);
+        if (!this.currentStudyDeck.cards.length) {
+            ToolAPI.showError('This deck has no cards to study');
+            return;
+        }
+
+        this.currentStudyCards = [...this.currentStudyDeck.cards];
+        this.currentCardIndex = 0;
+        
+        document.getElementById('studyArea').classList.remove('hidden');
+        document.getElementById('studyComplete').classList.add('hidden');
+        
+        this.showCurrentCard();
+    }
+
+    showCurrentCard() {
+        if (this.currentCardIndex >= this.currentStudyCards.length) {
+            this.completeStudySession();
+            return;
+        }
+
+        const card = this.currentStudyCards[this.currentCardIndex];
+        const progress = ((this.currentCardIndex + 1) / this.currentStudyCards.length) * 100;
+        
+        document.getElementById('studyProgress').textContent = `${this.currentCardIndex + 1} / ${this.currentStudyCards.length}`;
+        document.getElementById('studyProgressBar').style.width = `${progress}%`;
+        
+        document.getElementById('cardDisplay').innerHTML = `
+            <div class="text-2xl mb-4">${card.front}</div>
+        `;
+        
+        document.getElementById('cardActions').classList.remove('hidden');
+        document.getElementById('answerButtons').classList.add('hidden');
+    }
+
+    showAnswer() {
+        const card = this.currentStudyCards[this.currentCardIndex];
+        
+        document.getElementById('cardDisplay').innerHTML = `
+            <div class="text-xl mb-4 text-gray-300">${card.front}</div>
+            <hr class="border-white/20 my-4">
+            <div class="text-2xl">${card.back}</div>
+        `;
+        
+        document.getElementById('cardActions').classList.add('hidden');
+        document.getElementById('answerButtons').classList.remove('hidden');
+    }
+
+    answerCard(difficulty) {
+        this.currentCardIndex++;
+        this.showCurrentCard();
+    }
+
+    skipCard() {
+        this.currentCardIndex++;
+        this.showCurrentCard();
+    }
+
+    endStudy() {
+        this.completeStudySession();
+    }
+
+    completeStudySession() {
+        document.getElementById('studyArea').classList.add('hidden');
+        document.getElementById('studyComplete').classList.remove('hidden');
+        
+        document.getElementById('studyResults').innerHTML = `
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+                <div>
+                    <div class="text-2xl font-bold text-primary">${this.currentStudyCards.length}</div>
+                    <div class="text-gray-400">Cards Studied</div>
+                </div>
+                <div>
+                    <div class="text-2xl font-bold text-secondary">${this.currentStudyDeck.name}</div>
+                    <div class="text-gray-400">Deck Name</div>
+                </div>
+                <div>
+                    <div class="text-2xl font-bold text-green-400">100%</div>
+                    <div class="text-gray-400">Completion</div>
+                </div>
+            </div>
+        `;
+    }
+
+    updateStats() {
+        const totalCards = this.decks.reduce((sum, deck) => sum + deck.cards.length, 0);
+        
+        document.getElementById('totalDecks').textContent = this.decks.length;
+        document.getElementById('totalCards').textContent = totalCards;
+    }
+
+    updateDeckSelects() {
+        const selects = ['deckSelect', 'studyDeckSelect'];
+        
+        selects.forEach(selectId => {
+            const select = document.getElementById(selectId);
+            const currentValue = select.value;
+            
+            select.innerHTML = '<option value="">Select a deck...</option>';
+            
+            this.decks.forEach(deck => {
+                const option = document.createElement('option');
+                option.value = deck.id;
+                option.textContent = `${deck.name} (${deck.cards.length} cards)`;
+                select.appendChild(option);
+            });
+            
+            select.value = currentValue;
+        });
+    }
+
+    updateDecksList() {
+        const container = document.getElementById('decksList');
+        
+        if (this.decks.length === 0) {
+            container.innerHTML = '<p class="text-gray-400 text-center py-8">No decks created yet</p>';
+            return;
+        }
+        
+        container.innerHTML = this.decks.map(deck => `
+            <div class="glass rounded-xl p-4">
+                <div class="flex justify-between items-start">
+                    <div class="flex-1">
+                        <h3 class="text-lg font-bold mb-1">${deck.name}</h3>
+                        <p class="text-gray-400 text-sm mb-2">${deck.description || 'No description'}</p>
+                        <div class="flex items-center space-x-4 text-sm text-gray-300">
+                            <span><i class="fas fa-clone mr-1"></i>${deck.cards.length} cards</span>
+                            <span><i class="fas fa-calendar mr-1"></i>${new Date(deck.created).toLocaleDateString()}</span>
+                        </div>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button onclick="flashcardMaker.deleteDeck('${deck.id}')" class="p-2 text-red-400 hover:text-red-300">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    updateRecentDecks() {
+        const container = document.getElementById('recentDecks');
+        const recentDecks = this.decks.slice(-5).reverse();
+        
+        if (recentDecks.length === 0) {
+            container.innerHTML = '<p class="text-gray-400 text-sm text-center py-4">No decks created yet</p>';
+            return;
+        }
+        
+        container.innerHTML = recentDecks.map(deck => `
+            <div class="p-2 bg-dark/30 rounded text-sm">
+                <div class="font-semibold">${deck.name}</div>
+                <div class="text-xs text-gray-400">${deck.cards.length} cards</div>
+            </div>
+        `).join('');
+    }
+
+    deleteDeck(deckId) {
+        if (confirm('Are you sure you want to delete this deck?')) {
+            this.decks = this.decks.filter(deck => deck.id !== deckId);
+            this.saveDecks();
+            this.updateDeckSelects();
+            this.updateDecksList();
+            this.updateRecentDecks();
+            this.updateStats();
+            ToolAPI.showSuccess('Deck deleted successfully');
+        }
+    }
+
+    saveDecks() {
+        localStorage.setItem('disktools-flashcard-decks', JSON.stringify(this.decks));
+    }
+}
+
+// Initialize flashcard maker
+let flashcardMaker;
+document.addEventListener('DOMContentLoaded', () => {
+    flashcardMaker = new FlashcardMaker();
+});
+</script>
+{% endblock %}

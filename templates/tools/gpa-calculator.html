@@ -1,0 +1,376 @@
+{% extends "base.html" %}
+
+{% block title %}GPA Calculator - DiskTools{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-6 py-12">
+    <!-- Header -->
+    <div class="text-center mb-12">
+        <div class="inline-block p-4 bg-gradient-to-r from-primary to-secondary rounded-full mb-6">
+            <i class="fas fa-calculator text-4xl text-white"></i>
+        </div>
+        <h1 class="text-4xl font-bold mb-4 text-gradient">GPA Calculator</h1>
+        <p class="text-xl text-gray-300">Calculate your semester and cumulative GPA with grade predictions</p>
+    </div>
+
+    <!-- Calculator Interface -->
+    <div class="max-w-4xl mx-auto">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Input Section -->
+            <div class="lg:col-span-2">
+                <div class="glass rounded-2xl p-6">
+                    <h2 class="text-2xl font-bold mb-6 flex items-center">
+                        <i class="fas fa-plus-circle text-primary mr-3"></i>
+                        Add Courses
+                    </h2>
+                    
+                    <div id="coursesList" class="space-y-4 mb-6">
+                        <!-- Course input template -->
+                        <div class="course-input bg-dark/50 rounded-xl p-4 border border-white/10">
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                <input type="text" placeholder="Course Name" class="input-field">
+                                <select class="input-field">
+                                    <option value="">Select Grade</option>
+                                    <option value="A+">A+ (4.0)</option>
+                                    <option value="A">A (4.0)</option>
+                                    <option value="A-">A- (3.7)</option>
+                                    <option value="B+">B+ (3.3)</option>
+                                    <option value="B">B (3.0)</option>
+                                    <option value="B-">B- (2.7)</option>
+                                    <option value="C+">C+ (2.3)</option>
+                                    <option value="C">C (2.0)</option>
+                                    <option value="C-">C- (1.7)</option>
+                                    <option value="D+">D+ (1.3)</option>
+                                    <option value="D">D (1.0)</option>
+                                    <option value="F">F (0.0)</option>
+                                </select>
+                                <input type="number" placeholder="Credits" min="0" max="10" step="0.5" class="input-field">
+                                <button type="button" class="btn-danger" onclick="removeCourse(this)">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button id="addCourse" class="btn-secondary w-full">
+                        <i class="fas fa-plus mr-2"></i>
+                        Add Another Course
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Results Section -->
+            <div class="lg:col-span-1">
+                <div class="glass rounded-2xl p-6 sticky top-24">
+                    <h2 class="text-2xl font-bold mb-6 flex items-center">
+                        <i class="fas fa-chart-line text-primary mr-3"></i>
+                        Results
+                    </h2>
+                    
+                    <!-- Current GPA Display -->
+                    <div class="text-center mb-6">
+                        <div class="text-6xl font-black text-gradient mb-2" id="gpaDisplay">0.00</div>
+                        <p class="text-gray-400">Current GPA</p>
+                    </div>
+                    
+                    <!-- Statistics -->
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center p-3 bg-dark/50 rounded-lg">
+                            <span class="text-gray-300">Total Credits:</span>
+                            <span class="font-bold" id="totalCredits">0</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-dark/50 rounded-lg">
+                            <span class="text-gray-300">Quality Points:</span>
+                            <span class="font-bold" id="qualityPoints">0.00</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-dark/50 rounded-lg">
+                            <span class="text-gray-300">Grade Level:</span>
+                            <span class="font-bold" id="gradeLevel">-</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="mt-6 space-y-3">
+                        <button id="calculateGPA" class="btn-primary w-full">
+                            <i class="fas fa-calculator mr-2"></i>
+                            Calculate GPA
+                        </button>
+                        <button id="resetForm" class="btn-secondary w-full">
+                            <i class="fas fa-redo mr-2"></i>
+                            Reset
+                        </button>
+                        <button id="saveGPA" class="btn-secondary w-full">
+                            <i class="fas fa-save mr-2"></i>
+                            Save Results
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- GPA Scale Reference -->
+        <div class="mt-12 glass rounded-2xl p-6">
+            <h3 class="text-xl font-bold mb-4 flex items-center">
+                <i class="fas fa-info-circle text-primary mr-3"></i>
+                GPA Scale Reference
+            </h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                <div class="text-center p-3 bg-dark/50 rounded-lg">
+                    <div class="font-bold text-green-400">A+/A</div>
+                    <div class="text-sm text-gray-400">4.0</div>
+                </div>
+                <div class="text-center p-3 bg-dark/50 rounded-lg">
+                    <div class="font-bold text-green-300">A-</div>
+                    <div class="text-sm text-gray-400">3.7</div>
+                </div>
+                <div class="text-center p-3 bg-dark/50 rounded-lg">
+                    <div class="font-bold text-blue-400">B+</div>
+                    <div class="text-sm text-gray-400">3.3</div>
+                </div>
+                <div class="text-center p-3 bg-dark/50 rounded-lg">
+                    <div class="font-bold text-blue-300">B</div>
+                    <div class="text-sm text-gray-400">3.0</div>
+                </div>
+                <div class="text-center p-3 bg-dark/50 rounded-lg">
+                    <div class="font-bold text-yellow-400">C+</div>
+                    <div class="text-sm text-gray-400">2.3</div>
+                </div>
+                <div class="text-center p-3 bg-dark/50 rounded-lg">
+                    <div class="font-bold text-red-400">F</div>
+                    <div class="text-sm text-gray-400">0.0</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+class GPACalculator {
+    constructor() {
+        this.gradePoints = {
+            'A+': 4.0, 'A': 4.0, 'A-': 3.7,
+            'B+': 3.3, 'B': 3.0, 'B-': 2.7,
+            'C+': 2.3, 'C': 2.0, 'C-': 1.7,
+            'D+': 1.3, 'D': 1.0, 'F': 0.0
+        };
+        this.init();
+    }
+
+    init() {
+        this.setupEventListeners();
+        this.addCourse(); // Add initial course
+    }
+
+    setupEventListeners() {
+        document.getElementById('addCourse').addEventListener('click', () => this.addCourse());
+        document.getElementById('calculateGPA').addEventListener('click', () => this.calculateGPA());
+        document.getElementById('resetForm').addEventListener('click', () => this.resetForm());
+        document.getElementById('saveGPA').addEventListener('click', () => this.saveGPA());
+        
+        // Auto-calculate on input change
+        document.addEventListener('input', (e) => {
+            if (e.target.closest('.course-input')) {
+                this.calculateGPA();
+            }
+        });
+    }
+
+    addCourse() {
+        const coursesList = document.getElementById('coursesList');
+        const courseTemplate = coursesList.children[0].cloneNode(true);
+        
+        // Clear inputs
+        courseTemplate.querySelectorAll('input').forEach(input => input.value = '');
+        courseTemplate.querySelector('select').selectedIndex = 0;
+        
+        coursesList.appendChild(courseTemplate);
+        
+        // Add animation
+        courseTemplate.style.opacity = '0';
+        courseTemplate.style.transform = 'translateY(20px)';
+        setTimeout(() => {
+            courseTemplate.style.transition = 'all 0.3s ease';
+            courseTemplate.style.opacity = '1';
+            courseTemplate.style.transform = 'translateY(0)';
+        }, 50);
+    }
+
+    removeCourse(button) {
+        const courseInput = button.closest('.course-input');
+        const coursesList = document.getElementById('coursesList');
+        
+        if (coursesList.children.length > 1) {
+            courseInput.style.transition = 'all 0.3s ease';
+            courseInput.style.opacity = '0';
+            courseInput.style.transform = 'translateX(-100%)';
+            
+            setTimeout(() => {
+                courseInput.remove();
+                this.calculateGPA();
+            }, 300);
+        }
+    }
+
+    calculateGPA() {
+        const courses = document.querySelectorAll('.course-input');
+        let totalPoints = 0;
+        let totalCredits = 0;
+        let validCourses = 0;
+
+        courses.forEach(course => {
+            const grade = course.querySelector('select').value;
+            const credits = parseFloat(course.querySelector('input[type="number"]').value) || 0;
+            
+            if (grade && credits > 0) {
+                totalPoints += this.gradePoints[grade] * credits;
+                totalCredits += credits;
+                validCourses++;
+            }
+        });
+
+        const gpa = totalCredits > 0 ? totalPoints / totalCredits : 0;
+        
+        this.updateDisplay(gpa, totalCredits, totalPoints);
+        this.animateGPA(gpa);
+    }
+
+    updateDisplay(gpa, totalCredits, totalPoints) {
+        document.getElementById('gpaDisplay').textContent = gpa.toFixed(2);
+        document.getElementById('totalCredits').textContent = totalCredits.toFixed(1);
+        document.getElementById('qualityPoints').textContent = totalPoints.toFixed(2);
+        document.getElementById('gradeLevel').textContent = this.getGradeLevel(gpa);
+        
+        // Update GPA color based on value
+        const gpaDisplay = document.getElementById('gpaDisplay');
+        gpaDisplay.className = 'text-6xl font-black mb-2 ' + this.getGPAColor(gpa);
+    }
+
+    getGradeLevel(gpa) {
+        if (gpa >= 3.7) return 'Excellent';
+        if (gpa >= 3.3) return 'Good';
+        if (gpa >= 3.0) return 'Satisfactory';
+        if (gpa >= 2.0) return 'Needs Improvement';
+        return 'Poor';
+    }
+
+    getGPAColor(gpa) {
+        if (gpa >= 3.5) return 'text-green-400';
+        if (gpa >= 3.0) return 'text-blue-400';
+        if (gpa >= 2.5) return 'text-yellow-400';
+        if (gpa >= 2.0) return 'text-orange-400';
+        return 'text-red-400';
+    }
+
+    animateGPA(targetGPA) {
+        const display = document.getElementById('gpaDisplay');
+        const currentGPA = parseFloat(display.textContent) || 0;
+        const increment = (targetGPA - currentGPA) / 20;
+        let current = currentGPA;
+        
+        const animate = () => {
+            current += increment;
+            if ((increment > 0 && current < targetGPA) || (increment < 0 && current > targetGPA)) {
+                display.textContent = current.toFixed(2);
+                requestAnimationFrame(animate);
+            } else {
+                display.textContent = targetGPA.toFixed(2);
+            }
+        };
+        
+        if (Math.abs(increment) > 0.01) {
+            animate();
+        }
+    }
+
+    resetForm() {
+        const coursesList = document.getElementById('coursesList');
+        coursesList.innerHTML = '';
+        this.addCourse();
+        this.updateDisplay(0, 0, 0);
+        
+        ToolAPI.showSuccess('Form reset successfully!');
+    }
+
+    saveGPA() {
+        const gpa = document.getElementById('gpaDisplay').textContent;
+        const totalCredits = document.getElementById('totalCredits').textContent;
+        
+        const data = {
+            gpa: parseFloat(gpa),
+            totalCredits: parseFloat(totalCredits),
+            timestamp: new Date().toISOString(),
+            courses: this.getCourseData()
+        };
+        
+        localStorage.setItem('disktools-gpa-' + Date.now(), JSON.stringify(data));
+        ToolAPI.showSuccess('GPA results saved successfully!');
+    }
+
+    getCourseData() {
+        const courses = [];
+        document.querySelectorAll('.course-input').forEach(course => {
+            const name = course.querySelector('input[type="text"]').value;
+            const grade = course.querySelector('select').value;
+            const credits = course.querySelector('input[type="number"]').value;
+            
+            if (name && grade && credits) {
+                courses.push({ name, grade, credits: parseFloat(credits) });
+            }
+        });
+        return courses;
+    }
+}
+
+// Custom styles for this tool
+const toolStyles = `
+    .input-field {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        padding: 12px;
+        color: white;
+        transition: all 0.3s ease;
+    }
+    
+    .input-field:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+    }
+    
+    .btn-danger {
+        background: linear-gradient(45deg, #ef4444, #dc2626);
+        color: white;
+        padding: 12px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-danger:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(239, 68, 68, 0.4);
+    }
+`;
+
+// Inject tool styles
+const styleSheet = document.createElement('style');
+styleSheet.textContent = toolStyles;
+document.head.appendChild(styleSheet);
+
+// Initialize calculator
+document.addEventListener('DOMContentLoaded', () => {
+    new GPACalculator();
+});
+
+// Global function for remove button
+function removeCourse(button) {
+    if (window.gpaCalculator) {
+        window.gpaCalculator.removeCourse(button);
+    }
+}
+</script>
+{% endblock %}
